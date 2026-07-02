@@ -1,0 +1,9 @@
+{
+  "transaction_id": "tx_10485",
+  "date": "2026-07-01",
+  "description": "UPI/Zomato/Oder123",
+  "amount": -450.00,
+  "type": "debit",
+  "category": "Office Expenses",
+  "flagged_anomaly": false
+}
