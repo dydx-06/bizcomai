@@ -1,0 +1,6 @@
+# Local environment variables containing private Azure API keys
+.env
+
+# Python cache files (makes your repository cleaner)
+__pycache__/
+*.pyc
