@@ -3,12 +3,31 @@ import React, { useState } from 'react';
 const DocumentHub = () => {
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
 
-  const handleUpload = (e: React.FormEvent) => {
+  const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     setUploadStatus('Uploading and parsing document...');
-    setTimeout(() => {
-      setUploadStatus('Document successfully processed! Vector embeddings created.');
-    }, 1500);
+    
+    try {
+      const formData = new FormData();
+      // Using dummy data for integration demo
+      formData.append('file', new Blob(['dummy content']), 'document.pdf');
+      formData.append('doc_type', 'udyam');
+
+      const response = await fetch('http://localhost:8000/api/documents/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUploadStatus(`Document successfully processed! Vector embeddings created. (ID: ${data.document_id})`);
+      } else {
+        setUploadStatus('Upload failed. Please try again.');
+      }
+    } catch (error) {
+      console.error(error);
+      setUploadStatus('Error connecting to backend API.');
+    }
   };
 
   return (

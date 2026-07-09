@@ -1,0 +1,34 @@
+commit ac410329aeff7b14b91752121b38e7898b85e4e3
+Author: dhyan <dhyan.laad@gmail.com>
+Date:   Sat Jul 4 01:20:20 2026 +0530
+
+    Complete tasks on API stubs, frontend shell, Azure IaC
+
+ .github/workflows/deploy-backend.yml  |  37 ++++++++
+ .github/workflows/deploy-frontend.yml |  47 ++++++++++
+ api_contracts/openapi.yaml            | 170 ++++++++++++++++++++++++++++++++++
+ frontend/index.html                   |  13 +++
+ frontend/package.json                 |  29 ++++++
+ frontend/src/App.css                  | 131 ++++++++++++++++++++++++++
+ frontend/src/App.tsx                  |  42 +++++++++
+ frontend/src/index.css                |  49 ++++++++++
+ frontend/src/main.tsx                 |  13 +++
+ frontend/src/pages/AIAdvisor.tsx      |  67 ++++++++++++++
+ frontend/src/pages/Dashboard.tsx      |  33 +++++++
+ frontend/src/pages/DocumentHub.tsx    |  49 ++++++++++
+ frontend/src/pages/SchemeMatcher.tsx  |  86 +++++++++++++++++
+ frontend/tsconfig.json                |  25 +++++
+ frontend/tsconfig.node.json           |  10 ++
+ frontend/vite.config.ts               |   6 ++
+ infra/main.bicep                      |  62 +++++++++++++
+ 17 files changed, 869 insertions(+)
+
+commit 9897b7945122735c93bbbe6a32d7d685b1ddf16f
+Author: Sanjay Rajkumar <f20242044@hyderabad.bits-pilani.ac.in>
+Date:   Thu Jul 9 18:05:14 2026 +0530
+
+    feat: add modular voice_module for STT and TTS integration
+
+ .gitignore      |  6 ++++++
+ voice_module.py | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 65 insertions(+)

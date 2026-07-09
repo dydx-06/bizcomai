@@ -6,21 +6,46 @@ const AIAdvisor = () => {
     { role: 'assistant', content: 'Hello! I am your AI Business Advisor. You can ask me questions about your uploaded documents, cashflow, or government schemes.' }
   ]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
     
     // Add user message
-    setMessages([...messages, { role: 'user', content: query }]);
+    const userMessage = { role: 'user', content: query };
+    setMessages(prev => [...prev, userMessage]);
     setQuery('');
     
-    // Mock AI response
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://localhost:8000/api/qa/ask', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query_text: userMessage.content,
+          language: 'en'
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: data.answer_text 
+        }]);
+      } else {
+        setMessages(prev => [...prev, { 
+          role: 'assistant', 
+          content: 'Sorry, I encountered an error communicating with the server.' 
+        }]);
+      }
+    } catch (error) {
+      console.error(error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: 'Based on your Udyam certificate and recent bank statements, you qualify for the CGTMSE scheme. Would you like to know more about the application process?' 
+        content: 'Sorry, the connection to the server failed.' 
       }]);
-    }, 1000);
+    }
   };
 
   return (

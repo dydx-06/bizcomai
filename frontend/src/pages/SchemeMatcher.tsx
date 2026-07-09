@@ -12,24 +12,38 @@ const SchemeMatcher = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Stub API call based on scheme_match_schema.json
-    setTimeout(() => {
-      setSchemes([
-        {
-          scheme_name: "Credit Guarantee Fund Trust for Micro and Small Enterprises (CGTMSE)",
-          match_score: 95,
-          eligibility_reason: "Matches turnover < 5Cr and manufacturing sector criteria.",
-          application_url: "https://www.cgtmse.in/"
-        },
-        {
-          scheme_name: "Prime Minister's Employment Generation Programme (PMEGP)",
-          match_score: 82,
-          eligibility_reason: "Matches sector, but funding limits may apply based on current loan profile.",
-          application_url: "https://www.kviconline.gov.in/"
+    const fetchSchemes = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/schemes/match', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            business_id: 'biz_889',
+            state: 'Maharashtra',
+            sector: 'Manufacturing',
+            turnover_inr: 4500000,
+            employee_count: 12,
+            udyam_registered: true,
+            women_owned: false
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setSchemes(data);
+        } else {
+          console.error('Failed to fetch schemes');
         }
-      ]);
-      setLoading(false);
-    }, 1000);
+      } catch (error) {
+        console.error('Error connecting to backend:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSchemes();
   }, []);
 
   return (
