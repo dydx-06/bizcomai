@@ -1,0 +1,170 @@
+openapi: 3.0.3
+info:
+  title: AI Business Companion API
+  description: API contracts for the AI Business Companion for Indian MSMEs
+  version: 1.0.0
+
+servers:
+  - url: /api
+    description: Local development server
+
+paths:
+  /documents/upload:
+    post:
+      summary: Upload a document for processing (Udyam, GST, PDF, etc.)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                doc_type:
+                  type: string
+                  enum: [udyam, gst, scheme_pdf, other]
+      responses:
+        '200':
+          description: Document processed and embedded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document_id:
+                    type: string
+                  status:
+                    type: string
+                  chunks_processed:
+                    type: integer
+
+  /qa/ask:
+    post:
+      summary: Ask a question based on uploaded documents (Text or Voice)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query_text:
+                  type: string
+                language:
+                  type: string
+                  default: en
+                audio_base64:
+                  type: string
+                  description: Optional base64 encoded audio for voice queries
+      responses:
+        '200':
+          description: Answer response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  answer_text:
+                    type: string
+                  answer_audio_base64:
+                    type: string
+                  sources:
+                    type: array
+                    items:
+                      type: string
+
+  /transactions/parse:
+    post:
+      summary: Parse a bank statement file to extract transactions
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Extracted transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+
+  /schemes/match:
+    post:
+      summary: Get matched schemes based on a business profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessProfile'
+      responses:
+        '200':
+          description: List of matched schemes ranked by eligibility
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SchemeMatch'
+
+components:
+  schemas:
+    BusinessProfile:
+      type: object
+      properties:
+        business_id:
+          type: string
+        state:
+          type: string
+        sector:
+          type: string
+        turnover_inr:
+          type: number
+        employee_count:
+          type: integer
+        udyam_registered:
+          type: boolean
+        women_owned:
+          type: boolean
+
+    SchemeMatch:
+      type: object
+      properties:
+        scheme_name:
+          type: string
+        match_score:
+          type: integer
+        eligibility_reason:
+          type: string
+        application_url:
+          type: string
+
+    Transaction:
+      type: object
+      properties:
+        transaction_id:
+          type: string
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        amount:
+          type: number
+        type:
+          type: string
+          enum: [debit, credit]
+        category:
+          type: string
+        flagged_anomaly:
+          type: boolean
