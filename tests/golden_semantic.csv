@@ -1,0 +1,9 @@
+description,amount,expected_category
+payment to raw material vendor,-1000,supplier_payment
+goods and services tax challan payment,-1000,gst_payment
+monthly loan instalment debit,-1000,loan_emi
+monthly electricity bill payment,-1000,utility
+payment received from customer against invoice,1000,customer_receipt
+monthly staff compensation disbursement,-1000,salary
+monthly shop tenancy payment to landlord,-1000,rent
+stationery and printer cartridges,-1000,office_expense

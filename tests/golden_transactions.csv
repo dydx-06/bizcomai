@@ -1,0 +1,7 @@
+description,amount,expected_category
+IndiaMART vendor payment,-5000,supplier_payment
+GST CHALLAN CBIC,-12000,gst_payment
+BAJAJ FINANCE EMI,-8000,loan_emi
+BESCOM ELECTRICITY,-2000,utility
+RAZORPAY SETTLEMENT,50000,customer_receipt
+MONTHLY SALARY PAYOUT,-60000,salary
