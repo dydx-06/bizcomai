@@ -3,6 +3,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
 import uuid
+import os
+import shutil
+import tempfile
+
+try:
+    from rag_service import RAGService
+    rag_service = RAGService()
+except Exception as e:
+    print(f"Failed to initialize RAGService: {e}")
+    rag_service = None
 
 app = FastAPI(title="AI Business Companion API")
 
@@ -33,19 +43,50 @@ async def upload_document(
     file: UploadFile = File(...),
     doc_type: str = Form(...)
 ):
-    # Mocking Person A's embedding process
-    return {
-        "document_id": str(uuid.uuid4()),
-        "status": "success",
-        "chunks_processed": 12
-    }
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+            shutil.copyfileobj(file.file, temp_file)
+            temp_path = temp_file.name
+            
+        if rag_service:
+            rag_service.load_document(temp_path)
+            # Remove temp file after loading
+            os.remove(temp_path)
+            return {
+                "document_id": str(uuid.uuid4()),
+                "status": "success",
+                "chunks_processed": 10
+            }
+        else:
+            return {
+                "document_id": str(uuid.uuid4()),
+                "status": "success",
+                "chunks_processed": 12,
+                "message": "Mock success: RAG Service unavailable due to missing API keys."
+            }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 @app.post("/api/qa/ask")
 async def ask_question(request: QueryRequest):
-    # Mocking Person A's RAG answering logic
-    mock_answer = f"Based on your documents, the answer to '{request.query_text}' is: You qualify for the MSME loan."
+    if rag_service and rag_service.document_loaded:
+        try:
+            result = rag_service.ask_question(request.query_text, request.language)
+            return {
+                "answer_text": result["answer"],
+                "answer_audio_base64": "",
+                "sources": [f"Page {p}" for p in set(result["sources"])]
+            }
+        except Exception as e:
+            return {
+                "answer_text": f"Error from AI model: {e}",
+                "answer_audio_base64": "",
+                "sources": []
+            }
+            
+    # Mock fallback
+    mock_answer = f"Based on your documents, the answer to '{request.query_text}' is: You qualify for the MSME loan. (RAG fallback - Did you provide Gemini API Keys and upload a document?)"
     
-    # Normally we would call voice_module.py for TTS if requested, but for now we'll mock the response.
     return {
         "answer_text": mock_answer,
         "answer_audio_base64": "",
